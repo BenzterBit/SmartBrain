@@ -31,7 +31,8 @@ class App extends Component{
 			input : '',
 			imageUrl: '',
 			box : {},
-			route : 'signin'
+			route : 'signin',
+			isSignedin :false
 		}
 	}
 	calcFaceLoc = (data) =>{
@@ -53,7 +54,12 @@ class App extends Component{
 	}
 
 	onRouteChange = (route) => {
-		this.setState({route : route});
+		if(route==='signout'){
+		this.setState({isSignedin : false})
+	}else if(route==='home'){
+		this.setState({isSignedin : true})
+	}
+	this.setState({route : route});
 	}
 
 	onButtonSubmit = () => {
@@ -66,7 +72,7 @@ class App extends Component{
 		return(
 			<div className= "App">
 				<Particles className="particles" params= {particleStyle}/>
-				<Navigation onRouteChange={this.onRouteChange}/>
+				<Navigation isSignedin = {this.state.isSignedin} onRouteChange={this.onRouteChange} />
 				{this.state.route === 'home' 
 				?<div>
 					<Logo />
