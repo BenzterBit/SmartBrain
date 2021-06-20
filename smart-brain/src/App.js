@@ -32,8 +32,27 @@ class App extends Component{
 			imageUrl: '',
 			box : {},
 			route : 'signin',
-			isSignedin :false
+			isSignedin :false,
+			user:{
+				id:'',
+				name:'',
+				email: '',
+				password:'',
+				entries: '',
+				joined:''
+			}
 		}
+	}
+
+	loadUser = (data)=>{
+		this.setState({user:{
+			id:data.id,
+			name:data.name,
+			email: data.email,
+			password:data.password,
+			entries: data.entries,
+			joined: data.joined
+		}})
 	}
 	calcFaceLoc = (data) =>{
 		return{
@@ -65,9 +84,24 @@ class App extends Component{
 	onButtonSubmit = () => {
 		this.setState({imageUrl : this.state.input});
 		deepai.callStandardApi("facial-recognition", {image: this.state.input,})
-		.then(response=> this.displayFaceBox(this.calcFaceLoc(response)))
-		.catch(err => console.log(err));
+		.then(response=> {
+			if(response){
+				fetch('http://localhost:3000/image',{
+					method: 'put',
+		            headers: {'Content-Type': 'application/json'},
+		            body: JSON.stringify({
+		              id: this.state.user.id
+		            })
+				})
+			.then(response =>response.json())
+			.then(count => {
+			this.setState(Object.assign(this.state.user,{entries:count}))
+			})
+		}
+	this.displayFaceBox(this.calcFaceLoc(response))
+	}).catch(err => console.log(err));
 	}
+
 	render(){
 		return(
 			<div className= "App">
@@ -76,13 +110,16 @@ class App extends Component{
 				{this.state.route === 'home' 
 				?<div>
 					<Logo />
-					<Rank />
+					<Rank 
+					name={this.state.user.name}
+                	entries={this.state.user.entries}
+                	/>
 					<ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit}/>
 					<Facerecog box ={this.state.box} imageUrl={this.state.imageUrl}/>
 				</div>
 				: (this.state.route === 'signin' ? 
-					<Signin onRouteChange={this.onRouteChange}/>
-					:<Register onRouteChange={this.onRouteChange} />
+					<Signin loadUser ={this.loadUser} onRouteChange={this.onRouteChange}/>
+					:<Register loadUser ={this.loadUser} onRouteChange={this.onRouteChange} />
 					)
 			}
 			</div>
