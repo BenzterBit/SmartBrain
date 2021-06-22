@@ -1,4 +1,5 @@
 import React from 'react'
+import validator from 'validator'
 
 class Register extends React.Component{
 	constructor(props){
@@ -6,12 +7,22 @@ class Register extends React.Component{
 		this.state = {
 			email:'',
 			password:'',
-			name:''
+			name:'',
+			emailError:''
 		}
 	}
 
+
+
 	onEmailChange = (event)=>{
-		this.setState({email:event.target.value})
+		var email = event.target.value
+
+		if (validator.isEmail(email)) {
+			this.setState({email:event.target.value})
+			this.setState( {emailError:''})
+		} else {
+			this.setState( {emailError:'Enter valid Email!'})
+		}
 	}
 
 	onPasswordChange = (event)=>{
@@ -22,12 +33,13 @@ class Register extends React.Component{
 		this.setState({name:event.target.value})
 	}
 	onSubmitRegister = () =>{
+		if(this.state.emailError==='' && this.state.email!==''){
 		fetch('http://localhost:3000/register', {
 			method: 'post',
 			headers: {'Content-Type':'application/json'},
 			body : JSON.stringify({
-				email:this.email,
-				password:this.password,
+				email:this.state.email,
+				password:this.state.password,
 				name:this.state.name
 			})
 		}).then(response => response.json())
@@ -37,10 +49,11 @@ class Register extends React.Component{
 					this.props.onRouteChange('home');
 				}
 			})
-		
+		}else{
+			//dont do anything
+		}	
 	}
 	render() {
-		const {onRouteChange} = this.props;
 	return (
 		<article className="br3 ba b--black-10 mv4 w-100 w-50-m w-25-l mw6 shadow-5 center">
 		<main className="pa4 black-80">
@@ -54,7 +67,8 @@ class Register extends React.Component{
 			      </div>
 			      <div className="mt3">
 			        <label className="db fw6 lh-copy f6" htmlFor="email-address">Email</label>
-			        <input onChange={this.onEmailChange} className="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100" type="email" name="email-address"  id="email-address"/>
+			        <input onChange={this.onEmailChange} className="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100" type="email" name="email-address"  id="email-address"/><br/>
+			        <span style={{fontWeight: 'bold',color: 'red',}}>{this.state.emailError}</span>
 			      </div>
 			      <div className="mv3">
 			        <label className="db fw6 lh-copy f6" htmlFor="password">Password</label>
