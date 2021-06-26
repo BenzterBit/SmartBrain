@@ -33,7 +33,7 @@ class Signin extends React.Component{
 				}else{
 					alert("Error signing in, please make sure email password is correct!!!")
 				}
-			})
+			}) 
 		
 	}
 	render() {
