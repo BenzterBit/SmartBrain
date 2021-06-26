@@ -1,5 +1,6 @@
 import React from 'react'
 import validator from 'validator'
+import passValidator from 'password-validator'
 
 class Register extends React.Component{
 	constructor(props){
@@ -8,10 +9,10 @@ class Register extends React.Component{
 			email:'',
 			password:'',
 			name:'',
-			emailError:''
+			emailError:'',
+			passwordError:''
 		}
 	}
-
 
 
 	onEmailChange = (event)=>{
@@ -26,15 +27,37 @@ class Register extends React.Component{
 	}
 
 	onPasswordChange = (event)=>{
-		this.setState({password:event.target.value})
+
+		var schema = new passValidator();
+		schema
+		.is().min(6)                                    
+		.is().max(16)                                 
+		.has().uppercase()                              
+		.has().lowercase()                              
+		.has().digits(2)                                
+		.has().not().spaces()
+		.has().symbols();
+
+		var pass = event.target.value
+		if(schema.validate(pass)){
+			this.setState({password:event.target.value})
+			this.setState({passwordError:''})
+		}
+		else
+			this.setState({passwordError:'Password must be min 6 max 16, one upper , one lower, 2 num and symbol  and no space'})
 	}
 
 	onNameChange = (event)=>{
 		this.setState({name:event.target.value})
 	}
 	onSubmitRegister = () =>{
+<<<<<<< HEAD
 		if(this.state.emailError==='' && this.state.email!==''){
 		fetch('https://nameless-ravine-16043.herokuapp.com/register', {
+=======
+		if(this.state.emailError==='' && this.state.email!=='' && this.state.passwordError===''){
+		fetch('http://localhost:3000/register', {
+>>>>>>> 450a8ce0068224d6559f4f6804c6c86d4f00433f
 			method: 'post',
 			headers: {'Content-Type':'application/json'},
 			body : JSON.stringify({
@@ -54,6 +77,7 @@ class Register extends React.Component{
 		}	
 	}
 	render() {
+	
 	return (
 		<article className="br3 ba b--black-10 mv4 w-100 w-50-m w-25-l mw6 shadow-5 center">
 		<main className="pa4 black-80">
@@ -73,6 +97,7 @@ class Register extends React.Component{
 			      <div className="mv3">
 			        <label className="db fw6 lh-copy f6" htmlFor="password">Password</label>
 			        <input onChange={this.onPasswordChange} className="b pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100" type="password" name="password"  id="password"/>
+			        <span style={{fontWeight: 'bold',color: 'red',}}>{this.state.passwordError}</span>
 			      </div>
 			    </fieldset>
 			    <div className="">
