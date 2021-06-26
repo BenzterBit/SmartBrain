@@ -24,10 +24,8 @@ const particleStyle = {
                 }   
 		}
 	}
-class App extends Component{
-	constructor(){
-		super();
-		this.state = {
+
+const initialState = {
 			input : '',
 			imageUrl: '',
 			box : {},
@@ -41,8 +39,14 @@ class App extends Component{
 				entries: '',
 				joined:''
 			}
+
 		}
-	}
+
+class App extends Component{
+	constructor(){
+		super();
+		this.state = initialState;
+		}
 
 	loadUser = (data)=>{
 		this.setState({user:{
@@ -75,6 +79,7 @@ class App extends Component{
 	onRouteChange = (route) => {
 		if(route==='signout'){
 		this.setState({isSignedin : false})
+		this.setState(initialState);
 	}else if(route==='home'){
 		this.setState({isSignedin : true})
 	}
@@ -86,7 +91,7 @@ class App extends Component{
 		deepai.callStandardApi("facial-recognition", {image: this.state.input,})
 		.then(response=> {
 			if(response){
-				fetch('http://localhost:3000/image',{
+				fetch('https://nameless-ravine-16043.herokuapp.com/image',{
 					method: 'put',
 		            headers: {'Content-Type': 'application/json'},
 		            body: JSON.stringify({
@@ -96,7 +101,7 @@ class App extends Component{
 			.then(response =>response.json())
 			.then(count => {
 			this.setState(Object.assign(this.state.user,{entries:count}))
-			})
+			}).catch(console.log('error putting into server'))
 		}
 	this.displayFaceBox(this.calcFaceLoc(response))
 	}).catch(err => console.log(err));
